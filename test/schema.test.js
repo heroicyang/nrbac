@@ -60,7 +60,7 @@ describe('RBAC Data Schema', function() {
         },
         function(next) {
           Permission.create({
-            action: '&%adasd123',
+            action: 'create',
             resource: 'post'
           }, function(err) {
             should.exist(err);
