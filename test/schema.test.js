@@ -26,18 +26,17 @@ describe('RBAC Data Schema', function() {
   describe('Using Model compiled from Schema', function() {
     var Permission, Role;
 
-    beforeEach(function() {
+    before(function() {
       schema.registerHooks(db);
       schema.registerMethods();
+
       Permission = db.model('Permission', schema.PermissionSchema);
       Role = db.model('Role', schema.RoleSchema);
     });
 
-    afterEach(function() {
-      db._restore({
-        Permission: [],
-        Role: []
-      });
+    beforeEach(function() {
+      Permission.destroy();
+      Role.destroy();
     });
 
     it('should check params when save the permission', function(done) {
@@ -151,12 +150,12 @@ describe('RBAC Data Schema', function() {
         permission: function(next) {
           Permission.create({
             action: 'read',
-            resource: 'post'
+            resource: 'article'
           }, next);
         },
         role: function(next) {
           Role.create({
-            name: 'member'
+            name: 'guest'
           }, next);
         },
         roleGranted: ['permission', 'role', function(next, result) {
@@ -166,8 +165,8 @@ describe('RBAC Data Schema', function() {
         should.not.exist(err);
 
         var role = results.roleGranted;
-        role.can('read', 'post').should.be.ok;
-        role.can('create', 'post').should.not.be.ok;
+        role.can('read', 'article').should.be.ok;
+        role.can('create', 'article').should.not.be.ok;
         done();
       });
     });
