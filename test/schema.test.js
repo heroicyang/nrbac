@@ -121,52 +121,52 @@ describe('RBAC Data Schema', function() {
     });
 
     it('should grant correct permission to role', function(done) {
-      async.auto({
-        permission: function(next) {
+      async.waterfall([
+        function(next) {
           Permission.create({
             action: 'read',
             resource: 'post'
           }, next);
         },
-        role: function(next) {
+        function(permission, next) {
           Role.create({
             name: 'member'
-          }, next);
-        },
-        roleGranted: ['permission', 'role', function(next, result) {
-          result.role.grant(result.permission, next);
-        }]
-      }, function(err, results) {
+          }, function(err, role) {
+            if (err) {
+              return next(err);
+            }
+            role.grant(permission, next);
+          });
+        }
+      ], function(err, role) {
         should.not.exist(err);
-
-        var role = results.roleGranted;
         role.permissions.should.have.length(1);
         done();
       });
     });
 
     it('check permission', function(done) {
-      async.auto({
-        permission: function(next) {
+      async.waterfall([
+        function(next) {
           Permission.create({
             action: 'read',
-            resource: 'article'
+            resource: 'post'
           }, next);
         },
-        role: function(next) {
+        function(permission, next) {
           Role.create({
-            name: 'guest'
-          }, next);
-        },
-        roleGranted: ['permission', 'role', function(next, result) {
-          result.role.grant(result.permission, next);
-        }]
-      }, function(err, results) {
+            name: 'member'
+          }, function(err, role) {
+            if (err) {
+              return next(err);
+            }
+            role.grant(permission, next);
+          });
+        }
+      ], function(err, role) {
         should.not.exist(err);
-
-        var role = results.roleGranted;
-        role.can('read', 'article').should.be.ok;
-        role.can('create', 'article').should.not.be.ok;
+        role.can('read', 'post').should.be.true;
+        role.can('create', 'post').should.be.false;
         done();
       });
     });

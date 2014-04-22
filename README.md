@@ -47,7 +47,9 @@ The top-level of `nrbac` is an instance of the` nrbac.Provider` abstracts this a
 
 ### nrbac.Permission.create(permission, callback)
 
-Creates permissions, `permission` param can be an object consists of an `action` and a `resource`, or an array of objects.
+Creates permissions, `permission` can be an object consists of an `action` and a `resource`, or an array of objects.
+- `permission` Object or Array (of [Object, Object, ...])
+- `callback(err, permission)` Function
 
 ```javascript
 nrbac.Permission.create({
@@ -66,6 +68,8 @@ nrbac.Permission.create([
 ### nrbac.Permission.get(action, resource)
 
 Gets permission with the specified `action` and `resource`, return an instance of `nrbac.PermissionModel`.
+- `action` String
+- `resource` String
 
 ```javascript
 var createPostPermission = nrbac.Permission.get('create', 'post');
@@ -90,7 +94,9 @@ nrbac.Permission.list().should.be.empty;
 
 ### nrbac.Role.create(role, callback)
 
-Creates roles, `role` param can be an object consists of a unique `name`, or an array of objects.
+Creates roles, `role` can be an object consists of a unique `name`, or an array of objects.
+- `role` Object or Array (of [Object, Object, ...])
+- `callback(err, role)` Function
 
 ```javascript
 nrbac.Role.create({ name: 'member' }, function(err, role) {
@@ -106,6 +112,7 @@ nrbac.Role.create([
 ### nrbac.Role.get(name)
 
 Gets role with the specified `name`, return an instance of `nrbac.RoleModel`.
+- `name` String
 
 ```javascript
 var admin = nrbac.Role.get('admin');
@@ -129,30 +136,35 @@ nrbac.Role.list().should.be.empty;
 ```
 
 ### nrbac.PermissionModel
-#### permission.update(updateObj, [callback])
+#### permission.update(updateObj, callback)
 
 Updates the permission instance.
+- `updateObj` Object
+- `callback(err, permission)` Function
 
 ```javascript
 var permission = nrbac.Permission.get('create', 'post');
 permission.update({
   resource: 'article'
-});
+}, function(err, permission) {});
 ```
 
-#### permission.remove([callback])
+#### permission.remove(callback)
+- `callback(err, permission)` Function
 
 Deletes the permission instance.
 
 ```javascript
 var permission = nrbac.Permission.get('create', 'post');
-permission.remove();
+permission.remove(function(err, permission) {});
 ```
 
 ### nrbac.RoleModel
-#### role.grant(permissions, callback)
+#### role.grant(permission, callback)
 
-Grants permissions to the role. `permissions` param can be an instance of `nrbac.PermissionModel`, or an array of objects.
+Grants permissions to the role. `permission` can be an instance of `nrbac.PermissionModel`, or an array of objects.
+- `permission` `nrbac.PermissionModel` or Array (of [PermissionModel, PermissionModel, ...])
+- `callback(err, role)` Function
 
 ```javascript
 var createPostPermission = nrbac.Permission.get('create', 'post');
@@ -164,7 +176,9 @@ admin.grant(createPostPermission, function(err, role) {
 
 #### role.can(action, resource)
 
-Check if the role has the specified permission.
+Checks if the role has the given permission.
+- `action` String
+- `resource` String
 
 ```javascript
 var createPostPermission = nrbac.Permission.get('create', 'post');
@@ -175,27 +189,31 @@ admin.grant(createPostPermission, function(err, role) {
 });
 ```
 
-#### role.update(updateObj, [callback])
+#### role.update(updateObj, callback)
 
 Updates the role instance.
+- `updateObj` Object
+- `callback(err, role)` Function
 
 ```javascript
 var role = nrbac.Role.get('superadmin');
-role.update({ name: 'root' });
+role.update({ name: 'root' }, function(err, role) {});
 ```
 
-#### role.remove([callback])
+#### role.remove(callback)
 
 Deletes the role instance.
+- `callback(err, role)` Function
 
 ```javascript
 var role = nrbac.Role.get('superadmin');
-role.remove();
+role.remove(function(err, role) {});
 ```
 
 ### nrbac.use(storage)
 
 Use the specified storage.
+- `storage` `nrbac.BaseStorage`
 
 ```javascript
 nrbac.use(new nrbac.MemoryStorage());
@@ -203,7 +221,8 @@ nrbac.use(new nrbac.MemoryStorage());
 
 ### nrbac.sync(callback)
 
-Synchronous data between `nrbac` and storage engine you are using.
+Synchronizes data between `nrbac` and storage engine you are using.
+- `callback(err)` Function
 
 ```javascript
 var memoryStorage = new nrbac.MemoryStorage({
@@ -213,12 +232,12 @@ var memoryStorage = new nrbac.MemoryStorage({
 nrbac.use(memoryStorage);
 
 nrbac.sync(function(err) {
-  // now you can get the storage data
+  // now you can obtain the storage data
   should.exist(nrbac.Permission.get('read', 'post'));
 });
 
-// if you create permissions or roles, or grant permissions to roles
-//   you must call the `sync` method to synchronous the data to storage.
+// if you create permissions or roles, or grant permissions to roles...
+//   you must call the `sync` method to synchronize the data to storage.
 nrbac.Role.create({ name: 'vip' });
 nrbac.sync(function(err) {
   // data has been synchronized to the storage you are using
@@ -228,6 +247,7 @@ nrbac.sync(function(err) {
 ### nrbac.list(callback)
 
 Lists all data.
+- `callback(err, data)` Function
 
 ```javascript
 nrbac.list(function(err, data) {
@@ -249,7 +269,7 @@ A simple in-memory storage engine that stores a literal Object representation of
 var memoryStorage = new nrbac.MemoryStorage();
 nrbac.use(MemoryStorage);
 
-// you can specify the memory storage initial data
+// you can specify the initial data
 var memoryStorage = new nrbac.MemoryStorage({
   Permission: [{ action: 'read', resource: 'post' }],
   Role: [{ name: 'admin' }]
