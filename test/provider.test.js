@@ -64,13 +64,8 @@ describe('Provider Constructor', function() {
         });
       },
       function(next) {
-        var permission = db.Permission.findOne({
-          action: 'create',
-          resource: 'post'
-        });
-        var role = db.Role.findOne({
-          name: 'admin'
-        });
+        var permission = db.Permission.get('create', 'post');
+        var role = db.Role.get('admin');
         should.exist(permission);
         should.exist(role);
         next(null);
