@@ -24,7 +24,7 @@ async.waterfall([
       resource: 'post'
     }, next);
   },
-  function(next) {
+  function(permission, next) {
     rbac.Role.create({
       name: 'admin'
     }, function(err, role) {
