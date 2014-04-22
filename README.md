@@ -3,6 +3,8 @@ nrbac
 
 > Easy to use generic [RBAC(Role-Based Access Control)](https://en.wikipedia.org/wiki/Role-based_access_control) for node.
 
+Inspired by [nconf](https://github.com/flatiron/nconf) !
+
 ## Install
 
 ```bash
@@ -15,40 +17,263 @@ $ npm install nrbac --save
 var rbac = require('nrbac');
 var async = require('async');
 
-async.auto({
-  permission: function(next) {
+async.waterfall([
+  function(next) {
     rbac.Permission.create({
       action: 'create',
       resource: 'post'
     }, next);
   },
-  role: function(next) {
+  function(next) {
     rbac.Role.create({
       name: 'admin'
-    }, next);
-  },
-  roleGranted: ['permission', 'role', function(next, result) {
-    var permission = result.permission;
-    var role = result.role;
-
-    // grant permission
-    role.grant(permission, next);
-  }]
-}, function(err, results) {
-  var role = results.roleGranted;
+    }, function(err, role) {
+      if (err) {
+        return next(err);
+      }
+      // grant permission
+      role.grant(permission, next);
+    });
+  }
+], function(err, role) {
   role.can('create', 'post');  // true
   role.can('update', 'post');  // false
 });
 ```
 
-## Hierarchical
+## API Documentation
+
+The top-level of `nrbac` is an instance of the` nrbac.Provider` abstracts this all for you into a simple API.
+
+### nrbac.Permission.create(permission, callback)
+
+Creates permissions, `permission` param can be an object consists of an `action` and a `resource`, or an array of objects.
+
+```javascript
+nrbac.Permission.create({
+  action: 'create',
+  resource: 'post'
+}, function(err, permission) {
+  // permission is an instance of nrbac.PermissionModel
+});
+
+nrbac.Permission.create([
+  { action: 'update', resource: 'post' },
+  { action: 'delete', resource: 'post' }
+], function(err, permissions) {});
+```
+
+### nrbac.Permission.get(action, resource)
+
+Gets permission with the specified `action` and `resource`, return an instance of `nrbac.PermissionModel`.
+
+```javascript
+var createPostPermission = nrbac.Permission.get('create', 'post');
+```
+
+### nrbac.Permission.list()
+
+Lists all permissions.
+
+```javascript
+var permissions = nrbac.Permission.list();
+```
+
+### nrbac.Permission.destroy()
+
+Deletes all permissions.
+
+```javascript
+nrbac.Permission.destroy();
+nrbac.Permission.list().should.be.empty;
+```
+
+### nrbac.Role.create(role, callback)
+
+Creates roles, `role` param can be an object consists of a unique `name`, or an array of objects.
+
+```javascript
+nrbac.Role.create({ name: 'member' }, function(err, role) {
+  // role is an instance of nrbac.RoleModel
+});
+
+nrbac.Role.create([
+  { name: 'admin' },
+  { name: 'superadmin' }
+], function(err, roles) {});
+```
+
+### nrbac.Role.get(name)
+
+Gets role with the specified `name`, return an instance of `nrbac.RoleModel`.
+
+```javascript
+var admin = nrbac.Role.get('admin');
+```
+
+### nrbac.Role.list()
+
+Lists all roles.
+
+```javascript
+var roles = nrbac.Role.list();
+```
+
+### nrbac.Role.destroy()
+
+Deletes all roles.
+
+```javascript
+nrbac.Role.destroy();
+nrbac.Role.list().should.be.empty;
+```
+
+### nrbac.PermissionModel
+#### permission.update(updateObj, [callback])
+
+Updates the permission instance.
+
+```javascript
+var permission = nrbac.Permission.get('create', 'post');
+permission.update({
+  resource: 'article'
+});
+```
+
+#### permission.remove([callback])
+
+Deletes the permission instance.
+
+```javascript
+var permission = nrbac.Permission.get('create', 'post');
+permission.remove();
+```
+
+### nrbac.RoleModel
+#### role.grant(permissions, callback)
+
+Grants permissions to the role. `permissions` param can be an instance of `nrbac.PermissionModel`, or an array of objects.
+
+```javascript
+var createPostPermission = nrbac.Permission.get('create', 'post');
+var admin = nrbac.Role.get('admin');
+admin.grant(createPostPermission, function(err, role) {
+  // role granted permissions
+});
+```
+
+#### role.can(action, resource)
+
+Check if the role has the specified permission.
+
+```javascript
+var createPostPermission = nrbac.Permission.get('create', 'post');
+var admin = nrbac.Role.get('admin');
+admin.grant(createPostPermission, function(err, role) {
+  role.can('create', 'post');  // true
+  role.can('update', 'post');  // false
+});
+```
+
+#### role.update(updateObj, [callback])
+
+Updates the role instance.
+
+```javascript
+var role = nrbac.Role.get('superadmin');
+role.update({ name: 'root' });
+```
+
+#### role.remove([callback])
+
+Deletes the role instance.
+
+```javascript
+var role = nrbac.Role.get('superadmin');
+role.remove();
+```
+
+### nrbac.use(storage)
+
+Use the specified storage.
+
+```javascript
+nrbac.use(new nrbac.MemoryStorage());
+```
+
+### nrbac.sync(callback)
+
+Synchronous data between `nrbac` and storage engine you are using.
+
+```javascript
+var memoryStorage = new nrbac.MemoryStorage({
+  Permission: [{ action: 'read', resource: 'post' }],
+  Role: [{ name: 'admin' }]
+});
+nrbac.use(memoryStorage);
+
+nrbac.sync(function(err) {
+  // now you can get the storage data
+  should.exist(nrbac.Permission.get('read', 'post'));
+});
+
+// if you create permissions or roles, or grant permissions to roles
+//   you must call the `sync` method to synchronous the data to storage.
+nrbac.Role.create({ name: 'vip' });
+nrbac.sync(function(err) {
+  // data has been synchronized to the storage you are using
+});
+```
+
+### nrbac.list(callback)
+
+Lists all data.
+
+```javascript
+nrbac.list(function(err, data) {
+  // data output:
+  // {
+  //   Permission: [{ action: 'action', resource: 'resource' }, ...],
+  //   Role: [{ name: 'roleName' }, ...]
+  // }
+});
+```
 
 ## Storage Engines
 
 ### Memory
 
+A simple in-memory storage engine that stores a literal Object representation of the RBAC data.
+
+```javascript
+var memoryStorage = new nrbac.MemoryStorage();
+nrbac.use(MemoryStorage);
+
+// you can specify the memory storage initial data
+var memoryStorage = new nrbac.MemoryStorage({
+  Permission: [{ action: 'read', resource: 'post' }],
+  Role: [{ name: 'admin' }]
+});
+```
+
 ### File
+
+File storage engine allow you to read your RBAC data from `.json` file, and data will be persisted to disk when a call to `nrbac.sync()` is made.
 
 ### MongoDB
 
-### MySQL
+A MongoDB-based storage engine.
+
+### SQL
+
+A SQL-based storage engine, you can use **MySQL**, **PostgreSQL**, and **SQLite3**.
+
+## Run Tests
+
+```bash
+$ npm install
+$ npm test
+```
+
+### Author: [Heroic Yang](https://github.com/heroicyang)
+### License: MIT
