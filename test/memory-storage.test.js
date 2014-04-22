@@ -7,7 +7,7 @@ var MemoryStorage = require('../lib/storages/memory');
 describe('MemoryStorage Constructor', function() {
   var memoryStorage = new MemoryStorage();
 
-  it('should set correct name', function() {
+  it('should have the correct name set', function() {
     should.exist(memoryStorage);
     memoryStorage.name.should.eql('memory');
   });

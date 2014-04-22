@@ -2,7 +2,6 @@
  * Test dependencies
  */
 var should = require('should');
-var async = require('async');
 var db = require('../lib/database');
 
 describe('Database', function() {
@@ -39,13 +38,13 @@ describe('Database', function() {
 
     it('list()', function() {
       var permissions = db.Permission.list();
-      permissions.should.not.empty;
+      permissions.should.not.be.empty;
     });
 
     it('destroy()', function() {
       db.Permission.destroy();
       var permissions = db.Permission.list();
-      permissions.should.empty;
+      permissions.should.be.empty;
     });
   });
 
@@ -86,13 +85,13 @@ describe('Database', function() {
 
     it('list()', function() {
       var roles = db.Role.list();
-      roles.should.not.empty;
+      roles.should.not.be.empty;
     });
 
     it('destroy()', function() {
       db.Role.destroy();
       var roles = db.Role.list();
-      roles.should.empty;
+      roles.should.be.empty;
     });
   });
 });

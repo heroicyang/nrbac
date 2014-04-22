@@ -14,7 +14,7 @@ describe('Provider Constructor', function() {
     db.Role.destroy();
   });
 
-  it('should set correct submodule', function() {
+  it('should have the correct submodules set', function() {
     should.exist(Provider.db);
     should.exist(Provider.db.Permission);
     should.exist(Provider.db.Role);
