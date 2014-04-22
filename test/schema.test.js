@@ -11,8 +11,8 @@ var db = new Database();
 describe('RBAC Data Schema', function() {
   it('should register correct hooks', function() {
     schema.registerHooks(db);
-    schema.PermissionSchema.pres.save.should.have.length(2);
-    schema.RoleSchema.pres.save.should.have.length(2);
+    schema.PermissionSchema.pres.save.length.should.above(0);
+    schema.RoleSchema.pres.save.length.should.above(0);
   });
 
   it('should register correct methods', function() {
@@ -34,7 +34,7 @@ describe('RBAC Data Schema', function() {
       Role = db.model('Role', schema.RoleSchema);
     });
 
-    beforeEach(function() {
+    afterEach(function() {
       Permission.destroy();
       Role.destroy();
     });
@@ -49,7 +49,7 @@ describe('RBAC Data Schema', function() {
       });
     });
 
-    it('permission action and resource should unique', function(done) {
+    it('permission action and resource should be unique', function(done) {
       async.series([
         function(next) {
           Permission.create({
@@ -78,7 +78,7 @@ describe('RBAC Data Schema', function() {
       });
     });
 
-    it('role name should unique', function(done) {
+    it('role name should be unique', function(done) {
       async.series([
         function(next) {
           Role.create({
