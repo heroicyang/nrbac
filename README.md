@@ -292,6 +292,18 @@ nrbac.sync(function(err, data) {});
 
 A MongoDB-based storage engine.
 
+```javascript
+var mongodbStorage = new nrbac.MongoDBStorage({
+  server: '127.0.0.1',
+  database: 'your database'
+});
+
+nrbac.use(mongodbStorage);
+
+// synchronizes data from mongodb
+nrbac.sync(function(err, data) {});
+```
+
 ### SQL
 
 A SQL-based storage engine, you can use **MySQL**, **PostgreSQL**, and **SQLite3**.
