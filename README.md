@@ -267,7 +267,7 @@ A simple in-memory storage engine that stores a literal Object representation of
 
 ```javascript
 var memoryStorage = new nrbac.MemoryStorage();
-nrbac.use(MemoryStorage);
+nrbac.use(memoryStorage);
 
 // you can specify the initial data
 var memoryStorage = new nrbac.MemoryStorage({
@@ -278,7 +278,15 @@ var memoryStorage = new nrbac.MemoryStorage({
 
 ### File
 
-File storage engine allow you to read your RBAC data from `.json` file, and data will be persisted to disk when a call to `nrbac.sync()` is made.
+File storage engine allow you to read your RBAC data from file, and data will be persisted to disk when a call to `nrbac.sync()` is made.
+
+```javascript
+var fileStorage = new nrbac.FileStorage(__dirname + '/rbac.json');
+nrbac.use(fileStorage);
+
+// synchronizes data from __rbac.json__
+nrbac.sync(function(err, data) {});
+```
 
 ### MongoDB
 
