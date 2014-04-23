@@ -30,8 +30,8 @@ describe('RBAC Data Schema', function() {
       schema.registerHooks(db);
       schema.registerMethods();
 
-      Permission = db.model('Permission', schema.PermissionSchema);
-      Role = db.model('Role', schema.RoleSchema);
+      Permission = db.model('permissions', schema.PermissionSchema);
+      Role = db.model('roles', schema.RoleSchema);
     });
 
     afterEach(function() {

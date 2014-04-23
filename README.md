@@ -226,8 +226,8 @@ Synchronizes data between `nrbac` and storage engine you are using.
 
 ```javascript
 var memoryStorage = new nrbac.MemoryStorage({
-  Permission: [{ action: 'read', resource: 'post' }],
-  Role: [{ name: 'admin' }]
+  permissions: [{ action: 'read', resource: 'post' }],
+  roles: [{ name: 'admin' }]
 });
 nrbac.use(memoryStorage);
 
@@ -253,8 +253,8 @@ Lists all data.
 nrbac.list(function(err, data) {
   // data output:
   // {
-  //   Permission: [{ action: 'action', resource: 'resource' }, ...],
-  //   Role: [{ name: 'roleName' }, ...]
+  //   permissions: [{ action: 'action', resource: 'resource' }, ...],
+  //   roles: [{ name: 'roleName' }, ...]
   // }
 });
 ```
@@ -271,8 +271,8 @@ nrbac.use(MemoryStorage);
 
 // you can specify the initial data
 var memoryStorage = new nrbac.MemoryStorage({
-  Permission: [{ action: 'read', resource: 'post' }],
-  Role: [{ name: 'admin' }]
+  permissions: [{ action: 'read', resource: 'post' }],
+  roles: [{ name: 'admin' }]
 });
 ```
 

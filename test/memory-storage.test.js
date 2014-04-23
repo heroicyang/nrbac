@@ -22,8 +22,8 @@ describe('MemoryStorage Constructor', function() {
 
   it('save(data, callback)', function(done) {
     var data = {
-      Permission: [{ action: 'create', resource: 'post' }],
-      Role: [{ name: 'admin' }]
+      permissions: [{ action: 'create', resource: 'post' }],
+      roles: [{ name: 'admin' }]
     };
     memoryStorage.save(data, function(err) {
       should.not.exist(err);

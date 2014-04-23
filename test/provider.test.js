@@ -30,8 +30,8 @@ describe('Provider Constructor', function() {
   it('list(callback)', function(done) {
     var provider = new Provider();
     var data = {
-      Permission: [{ action: 'create', resource: 'post' }],
-      Role: [{ name: 'admin' }]
+      permissions: [{ action: 'create', resource: 'post' }],
+      roles: [{ name: 'admin' }]
     };
     var memoryStorage = new MemoryStorage(data);
     provider.use(memoryStorage);
@@ -42,8 +42,8 @@ describe('Provider Constructor', function() {
       }
 
       should.exist(result);
-      result.Permission.should.have.length(1);
-      result.Role.should.have.length(1);
+      result.permissions.should.have.length(1);
+      result.roles.should.have.length(1);
       done();
     });
   });
@@ -51,8 +51,8 @@ describe('Provider Constructor', function() {
   it('sync(callback)', function(done) {
     var provider = new Provider();
     var data = {
-      Permission: [{ action: 'create', resource: 'post' }],
-      Role: [{ name: 'admin' }]
+      permissions: [{ action: 'create', resource: 'post' }],
+      roles: [{ name: 'admin' }]
     };
     var memoryStorage = new MemoryStorage(data);
     provider.use(memoryStorage);
