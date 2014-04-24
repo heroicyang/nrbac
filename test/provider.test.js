@@ -6,29 +6,22 @@ var should = require('should');
 var Provider = require('../lib/provider');
 var MemoryStorage = require('../lib/storages/memory');
 
-var db = Provider.db;
-
 describe('Provider Constructor', function() {
-  afterEach(function() {
-    db.Permission.destroy();
-    db.Role.destroy();
-  });
+  var provider = new Provider();
+  var models = provider.models;
 
-  it('should have the correct submodules set', function() {
-    should.exist(Provider.db);
-    should.exist(Provider.db.Permission);
-    should.exist(Provider.db.Role);
+  afterEach(function() {
+    models.Permission.destroy();
+    models.Role.destroy();
   });
 
   it('use(storage)', function() {
-    var provider = new Provider();
     var memoryStorage = new MemoryStorage();
     provider.use(memoryStorage);
     provider._storage.should.be.an.instanceof(MemoryStorage);
   });
 
   it('list(callback)', function(done) {
-    var provider = new Provider();
     var data = {
       permissions: [{ action: 'create', resource: 'post' }],
       roles: [{ name: 'admin' }]
@@ -49,7 +42,6 @@ describe('Provider Constructor', function() {
   });
 
   it('sync(callback)', function(done) {
-    var provider = new Provider();
     var data = {
       permissions: [{ action: 'create', resource: 'post' }],
       roles: [{ name: 'admin' }]
@@ -64,8 +56,11 @@ describe('Provider Constructor', function() {
         });
       },
       function(next) {
-        var permission = db.Permission.get('create', 'post');
-        var role = db.Role.get('admin');
+        var permission = models.Permission.findOne({
+          action: 'create',
+          resource: 'post'
+        });
+        var role = models.Role.findOne({ name: 'admin' });
         should.exist(permission);
         should.exist(role);
         next(null);
