@@ -3,14 +3,19 @@
  */
 var should = require('should');
 var async = require('async');
+var sinon = require('sinon');
 var Database = require('warehouse');
 var schema = require('../lib/schema');
 
 var db = new Database();
 
-describe('RBAC Data Schema', function() {
+describe('Data Schema', function() {
+  var saveToStorageFunc = sinon.spy();
   var models = schema.model({
-    _db: db
+    _db: db,
+    _storage: {
+      save: saveToStorageFunc
+    }
   });
   var Permission = models.Permission;
   var Role = models.Role;
@@ -149,6 +154,22 @@ describe('RBAC Data Schema', function() {
       role.can('read', 'post').should.be.true;
       role.can('create', 'post').should.be.false;
       done();
+    });
+  });
+
+  it('should call storage\'s save method after permission or role changed', function(done) {
+    Permission.create({
+      action: 'update',
+      resource: 'post'
+    }, function(err) {
+      if (err) {
+        return done(err);
+      }
+
+      setImmediate(function() {
+        saveToStorageFunc.called.should.be.true;
+        done();
+      });
     });
   });
 });
