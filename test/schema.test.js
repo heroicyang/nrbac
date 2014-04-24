@@ -103,7 +103,7 @@ describe('Data Schema', function() {
     });
   });
 
-  it('should grant correct permission to role', function(done) {
+  it('should grant correct permission for role', function(done) {
     async.waterfall([
       function(next) {
         Permission.create({
@@ -124,6 +124,36 @@ describe('Data Schema', function() {
     ], function(err, role) {
       should.not.exist(err);
       role.permissions.should.have.length(1);
+      done();
+    });
+  });
+
+  it('should revoke correct permission for role', function(done) {
+    async.waterfall([
+      function(next) {
+        Permission.create({
+          action: 'read',
+          resource: 'post'
+        }, next);
+      },
+      function(permission, next) {
+        Role.create({
+          name: 'member'
+        }, function(err, role) {
+          if (err) {
+            return next(err);
+          }
+          role.grant(permission, function(err, role) {
+            next(err, role, permission);
+          });
+        });
+      },
+      function(role, permission, next) {
+        role.revoke(permission, next);
+      }
+    ], function(err, role) {
+      should.not.exist(err);
+      role.permissions.should.have.length(0);
       done();
     });
   });
