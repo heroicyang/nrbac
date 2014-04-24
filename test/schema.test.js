@@ -10,13 +10,10 @@ var schema = require('../lib/schema');
 var db = new Database();
 
 describe('Data Schema', function() {
-  var saveToStorageFunc = sinon.spy();
-  var models = schema.model({
-    _db: db,
-    _storage: {
-      save: saveToStorageFunc
-    }
-  });
+  var provider = {
+    _db: db
+  };
+  var models = schema.model(provider);
   var Permission = models.Permission;
   var Role = models.Role;
 
@@ -158,6 +155,11 @@ describe('Data Schema', function() {
   });
 
   it('should call storage\'s save method after permission or role changed', function(done) {
+    var saveToStorageFunc = sinon.spy();
+    provider._storage = {
+      save: saveToStorageFunc
+    };
+
     Permission.create({
       action: 'update',
       resource: 'post'
