@@ -142,7 +142,7 @@ nrbac.Role.list().should.be.empty;
 ### nrbac.PermissionModel
 #### permission.update(updateObj, callback)
 
-Updates the permission instance.
+Updates permission.
 - `updateObj` {Object}
 - `callback(err, permission)` {Function}
 
@@ -156,7 +156,7 @@ permission.update({
 #### permission.remove(callback)
 - `callback(err, permission)` {Function}
 
-Deletes the permission instance.
+Deletes permission.
 
 ```javascript
 var permission = nrbac.Permission.get('create', 'post');
@@ -195,7 +195,7 @@ admin.grant(createPostPermission, function(err, role) {
 
 #### role.update(updateObj, callback)
 
-Updates the role instance.
+Updates role.
 - `updateObj` {Object}
 - `callback(err, role)` {Function}
 
@@ -206,7 +206,7 @@ role.update({ name: 'root' }, function(err, role) {});
 
 #### role.remove(callback)
 
-Deletes the role instance.
+Deletes role.
 - `callback(err, role)` {Function}
 
 ```javascript
@@ -225,19 +225,36 @@ nrbac.use(new nrbac.MemoryStorage());
 
 ### nrbac.sync(callback)
 
-Synchronizes data from storage you are using.
+Synchronizes data between `nrbac` instance and storage you are using.
 - `callback(err)` {Function}
 
 ```javascript
-var memoryStorage = new nrbac.MemoryStorage({
-  permissions: [{ action: 'read', resource: 'post' }],
-  roles: [{ name: 'admin' }]
-});
-nrbac.use(memoryStorage);
+var fileStorage = new nrbac.FileStorage(__dirname + '/rbac.json');
+nrbac.use(fileStorage);
 
 nrbac.sync(function(err) {
   // now you can obtain the storage data
   should.exist(nrbac.Permission.get('read', 'post'));
+});
+
+// if your permissions/roles changed (create, update, remove),
+//   or grant/revoke permissions to roles,
+//   you must call the `sync` method to synchronize the data to the storage you are using.
+var async = require('async');
+async.parallel([
+  function createRole(next) {
+    nrbac.Role.create({ name: 'vip' }, next);
+  },
+  function grantPermissions(next) {
+    var createPostPermission = nrbac.Permission.get('create', 'post');
+    var admin = nrbac.Role.get('admin');
+    admin.grant(createPostPermission, next);
+  }
+  //... more business
+], function(err) {
+  nrbac.sync(function(err) {
+    // data has been synchronized to the storage you are using
+  });
 });
 ```
 
@@ -261,23 +278,16 @@ nrbac.list(function(err, data) {
 ### Memory
 
 A simple in-memory storage engine that stores a literal Object representation of the RBAC data.
-#### nrbac.MemoryStorage(initialData)
-- `initialData` {Object} optional
+#### nrbac.MemoryStorage()
 
 ```javascript
 var memoryStorage = new nrbac.MemoryStorage();
 nrbac.use(memoryStorage);
-
-// you can specify the initial data
-var memoryStorage = new nrbac.MemoryStorage({
-  permissions: [{ action: 'read', resource: 'post' }],
-  roles: [{ name: 'admin' }]
-});
 ```
 
 ### File
 
-File storage engine allow you to read your RBAC data from file, and data will be persisted to disk after changed.
+File storage engine allow you to read your RBAC data from file, and data will be persisted to disk when a call to `nrbac.sync()` is made.
 #### nrbac.FileStorage(filepath)
 - `filepath` {String}  (required)
 
@@ -286,7 +296,7 @@ var fileStorage = new nrbac.FileStorage(__dirname + '/rbac.json');
 nrbac.use(fileStorage);
 
 // synchronizes data from __rbac.json__
-nrbac.sync(function(err, data) {});
+nrbac.sync(function(err) {});
 ```
 
 ### MongoDB
@@ -311,7 +321,7 @@ var mongodbStorage = new nrbac.MongoDBStorage({
 nrbac.use(mongodbStorage);
 
 // synchronizes data from mongodb
-nrbac.sync(function(err, data) {});
+nrbac.sync(function(err) {});
 ```
 
 ### SQL

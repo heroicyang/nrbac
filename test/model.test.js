@@ -3,19 +3,11 @@
  */
 var should = require('should');
 var async = require('async');
-var sinon = require('sinon');
-var Database = require('warehouse');
-var schema = require('../lib/schema');
+var model = require('../lib/model');
 
-var db = new Database();
-
-describe('Data Schema', function() {
-  var provider = {
-    _db: db
-  };
-  var models = schema.model(provider);
-  var Permission = models.Permission;
-  var Role = models.Role;
+describe('Data Model', function() {
+  var Permission = model.Permission;
+  var Role = model.Role;
 
   afterEach(function() {
     Permission.destroy();
@@ -181,27 +173,6 @@ describe('Data Schema', function() {
       role.can('read', 'post').should.be.true;
       role.can('create', 'post').should.be.false;
       done();
-    });
-  });
-
-  it('should call storage\'s save method after permission or role changed', function(done) {
-    var saveToStorageFunc = sinon.spy();
-    provider._storage = {
-      save: saveToStorageFunc
-    };
-
-    Permission.create({
-      action: 'update',
-      resource: 'post'
-    }, function(err) {
-      if (err) {
-        return done(err);
-      }
-
-      setImmediate(function() {
-        saveToStorageFunc.called.should.be.true;
-        done();
-      });
     });
   });
 });

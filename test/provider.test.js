@@ -3,16 +3,35 @@
  */
 var async = require('async');
 var should = require('should');
+var model = require('../lib/model');
 var Provider = require('../lib/provider');
 var MemoryStorage = require('../lib/storages/memory');
 
 describe('Provider Constructor', function() {
   var provider = new Provider();
-  var models = provider.models;
+
+  beforeEach(function(done) {
+    var memoryStorage = new MemoryStorage();
+    provider.use(memoryStorage);
+
+    async.parallel([
+      function(next) {
+        model.Permission.create({
+          action: 'create',
+          resource: 'post'
+        }, next);
+      },
+      function(next) {
+        model.Role.create({
+          name: 'admin'
+        }, next);
+      }
+    ], done);
+  });
 
   afterEach(function() {
-    models.Permission.destroy();
-    models.Role.destroy();
+    model.Permission.destroy();
+    model.Role.destroy();
   });
 
   it('use(storage)', function() {
@@ -22,13 +41,6 @@ describe('Provider Constructor', function() {
   });
 
   it('list(callback)', function(done) {
-    var data = {
-      permissions: [{ action: 'create', resource: 'post' }],
-      roles: [{ name: 'admin' }]
-    };
-    var memoryStorage = new MemoryStorage(data);
-    provider.use(memoryStorage);
-
     provider.list(function(err, result) {
       if (err) {
         return done(err);
@@ -42,13 +54,6 @@ describe('Provider Constructor', function() {
   });
 
   it('sync(callback)', function(done) {
-    var data = {
-      permissions: [{ action: 'create', resource: 'post' }],
-      roles: [{ name: 'admin' }]
-    };
-    var memoryStorage = new MemoryStorage(data);
-    provider.use(memoryStorage);
-
     async.waterfall([
       function(next) {
         provider.sync(function(err) {
@@ -56,11 +61,11 @@ describe('Provider Constructor', function() {
         });
       },
       function(next) {
-        var permission = models.Permission.findOne({
+        var permission = model.Permission.findOne({
           action: 'create',
           resource: 'post'
         });
-        var role = models.Role.findOne({ name: 'admin' });
+        var role = model.Role.findOne({ name: 'admin' });
         should.exist(permission);
         should.exist(role);
         next(null);
