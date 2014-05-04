@@ -11,8 +11,8 @@ describe('MongoDBStorage Constructor', function() {
 
   before(function(done) {
     var data = {
-      permissions: [{ action: 'create', resource: 'post' }],
-      roles: [{ name: 'admin' }]
+      permissions: [{ action: 'create', resource: 'post', _id: 'a123bc' }],
+      roles: [{ name: 'admin', _id: 'asd123' }]
     };
     mongodbStorage.save(data, done);
   });
@@ -37,18 +37,16 @@ describe('MongoDBStorage Constructor', function() {
 
   it('save(data, callback)', function(done) {
     var data = {
-      permissions: [{ action: 'update', resource: 'post' }],
-      roles: [{ name: 'admin' }]
+      permissions: [{ action: 'update', resource: 'post', _id: 'a234bc' }],
+      roles: [{ name: 'root', _id: 'asd123' }]
     };
     mongodbStorage.save(data, function(err) {
       should.not.exist(err);
       mongodbStorage.list(function(err, result) {
         should.exist(result);
-        result.permissions.should.have.length(1);
+        result.permissions.should.have.length(2);
         result.roles.should.have.length(1);
-        result.permissions[0].action.should.eql('update');
-        result.permissions[0].resource.should.eql('post');
-        result.roles[0].name.should.eql('admin');
+        result.roles[0].name.should.eql('root');
         done();
       });
     });
