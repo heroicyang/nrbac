@@ -14,7 +14,7 @@ describe('Top-level include for the nrbac module', function() {
     should.exist(nrbac.PermissionModel);
     should.exist(nrbac.RoleModel);
     should.exist(nrbac.FileStorage);
-    should.exist(nrbac.MongoDBStorage);
+    should.exist(nrbac.MongoStorage);
   });
 
   describe('Permission', function() {

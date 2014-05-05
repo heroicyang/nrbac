@@ -2,10 +2,10 @@
  * Test dependencies
  */
 var should = require('should');
-var MongoDBStorage = require('../lib/storages/mongodb');
+var MongoStorage = require('../lib/storages/mongo');
 
-describe('MongoDBStorage Constructor', function() {
-  var mongodbStorage = new MongoDBStorage({
+describe('MongoStorage Constructor', function() {
+  var mongodbStorage = new MongoStorage({
     db: 'nrbac'
   });
 

@@ -216,7 +216,7 @@ role.remove(function(err, role) {});
 
 ### nrbac.use(storage)
 
-Use the specified storage.
+Uses the specified storage.
 - `storage`
 
 ```javascript
@@ -250,7 +250,7 @@ async.parallel([
     var admin = nrbac.Role.get('admin');
     admin.grant(createPostPermission, next);
   }
-  //... more business
+  //... more businesses
 ], function(err) {
   nrbac.sync(function(err) {
     // data has been synchronized to the storage you are using
@@ -292,7 +292,7 @@ nrbac.sync(function(err) {});
 ### MongoDB
 
 A MongoDB-based storage engine.
-#### nrbac.MongoDBStorage(options)
+#### nrbac.MongoStorage(options)
 - `options` {Object}
   - `db` Database name or fully instantiated `node-mongo-native` object (required)
   - `host` MongoDB server hostname (optional, default: `127.0.0.1`)
@@ -304,7 +304,7 @@ A MongoDB-based storage engine.
   - `url` Connection url of the form: `mongodb://user:pass@host:port/database`. If provided, information in the URL takes priority over the other options
 
 ```javascript
-var mongodbStorage = new nrbac.MongoDBStorage({
+var mongodbStorage = new nrbac.MongoStorage({
   db: 'your database'
 });
 
