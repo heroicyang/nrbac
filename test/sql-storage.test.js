@@ -17,6 +17,10 @@ describe('MongoStorage Constructor', function() {
   });
 
   before(function(done) {
+    sqlStorage.initialize(done);
+  });
+
+  before(function(done) {
     var data = {
       permissions: [{ action: 'create', resource: 'post', _id: 'a123bc' }],
       roles: [{ name: 'admin', _id: 'asd123' }]
