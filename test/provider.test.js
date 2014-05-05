@@ -1,19 +1,17 @@
 /**
  * Test dependencies
  */
+var fs = require('fs');
 var async = require('async');
 var should = require('should');
 var model = require('../lib/model');
 var Provider = require('../lib/provider');
-var MemoryStorage = require('../lib/storages/memory');
+var FileStorage = require('../lib/storages/file');
 
 describe('Provider Constructor', function() {
   var provider = new Provider();
 
   beforeEach(function(done) {
-    var memoryStorage = new MemoryStorage();
-    provider.use(memoryStorage);
-
     async.parallel([
       function(next) {
         model.Permission.create({
@@ -35,9 +33,9 @@ describe('Provider Constructor', function() {
   });
 
   it('use(storage)', function() {
-    var memoryStorage = new MemoryStorage();
-    provider.use(memoryStorage);
-    provider._storage.should.be.an.instanceof(MemoryStorage);
+    var fileStorage = new FileStorage(__dirname + '/nrbac.json');
+    provider.use(fileStorage);
+    provider._storage.should.be.an.instanceof(FileStorage);
   });
 
   it('list(callback)', function(done) {
@@ -71,5 +69,9 @@ describe('Provider Constructor', function() {
         next(null);
       }
     ], done);
+  });
+
+  after(function(done) {
+    fs.unlink(__dirname + '/nrbac.json', done);
   });
 });

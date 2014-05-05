@@ -217,10 +217,10 @@ role.remove(function(err, role) {});
 ### nrbac.use(storage)
 
 Use the specified storage.
-- `storage` {BaseStorage}
+- `storage`
 
 ```javascript
-nrbac.use(new nrbac.MemoryStorage());
+nrbac.use(new nrbac.FileStorage(__dirname + '/nrbac.json'));
 ```
 
 ### nrbac.sync(callback)
@@ -274,16 +274,6 @@ nrbac.list(function(err, data) {
 ```
 
 ## Storage Engines
-
-### Memory
-
-A simple in-memory storage engine that stores a literal Object representation of the RBAC data.
-#### nrbac.MemoryStorage()
-
-```javascript
-var memoryStorage = new nrbac.MemoryStorage();
-nrbac.use(memoryStorage);
-```
 
 ### File
 

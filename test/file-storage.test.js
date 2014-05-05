@@ -16,9 +16,9 @@ describe('FileStorage Constructor', function() {
     fileStorage.save(data, done);
   });
 
-  it('should have the correct name set', function() {
+  it('should have the correct type set', function() {
     should.exist(fileStorage);
-    fileStorage.name.should.eql('file');
+    fileStorage.type.should.eql('file');
   });
 
   it('list(callback)', function(done) {

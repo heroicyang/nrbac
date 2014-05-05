@@ -17,9 +17,9 @@ describe('MongoDBStorage Constructor', function() {
     mongodbStorage.save(data, done);
   });
 
-  it('should have the correct name set', function() {
+  it('should have the correct type set', function() {
     should.exist(mongodbStorage);
-    mongodbStorage.name.should.eql('mongodb');
+    mongodbStorage.type.should.eql('mongodb');
   });
 
   it('list(callback)', function(done) {
