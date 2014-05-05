@@ -285,7 +285,7 @@ File storage engine allow you to read your RBAC data from file, and data will be
 var fileStorage = new nrbac.FileStorage(__dirname + '/rbac.json');
 nrbac.use(fileStorage);
 
-// synchronizes data from __rbac.json__
+// synchronizes data from/to file `./rbac.json`
 nrbac.sync(function(err) {});
 ```
 
@@ -310,13 +310,35 @@ var mongodbStorage = new nrbac.MongoStorage({
 
 nrbac.use(mongodbStorage);
 
-// synchronizes data from mongodb
+// synchronizes data from/to mongodb
 nrbac.sync(function(err) {});
 ```
 
 ### SQL
 
 A SQL-based storage engine, you can use **MySQL**, **PostgreSQL**, and **SQLite3**.
+#### nrbac.SqlStorage(options)
+- `options` {Object}  See [Knex.js](http://knexjs.org/#initialize)
+  - `client` Database client adapter will be used, can be `mysql`, `pg`, `sqlite3` (required)
+  - `connection` Connection config
+
+```javascript
+var sqlStorage = new nrbac.SqlStorage({
+  client: 'mysql',
+  connection: {
+    host: '127.0.0.1',
+    user: 'heroic',
+    password: '111111',
+    database: 'nrbac',
+    charset: 'UTF8_GENERAL_CI'
+  }
+});
+
+nrbac.use(sqlStorage);
+
+// synchronizes data from/to database
+nrbac.sync(function(err) {});
+```
 
 ## Run Tests
 

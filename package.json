@@ -41,6 +41,8 @@
     "sinon": "^1.9.1"
   },
   "optionalDependencies": {
-    "mongodb": "^1.4.2"
+    "bookshelf": "^0.6.10",
+    "mongodb": "^1.4.2",
+    "mysql": "^2.2.0"
   }
 }
