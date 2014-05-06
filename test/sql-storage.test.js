@@ -4,7 +4,7 @@
 var should = require('should');
 var SqlStorage = require('../lib/storages/sql');
 
-describe('MongoStorage Constructor', function() {
+describe('SqlStorage Constructor', function() {
   var sqlStorage = new SqlStorage({
     client: 'mysql',
     connection: {
@@ -49,7 +49,7 @@ describe('MongoStorage Constructor', function() {
   it('save(data, callback)', function(done) {
     var data = {
       permissions: [{ action: 'update', resource: 'post', _id: 'a234bc' }],
-      roles: [{ name: 'root', _id: 'asd123' }]
+      roles: [{ name: 'root', _id: 'asd123', permissions: ['a234bc'] }]
     };
     sqlStorage.save(data, function(err) {
       should.not.exist(err);
@@ -58,6 +58,7 @@ describe('MongoStorage Constructor', function() {
         result.permissions.should.have.length(2);
         result.roles.should.have.length(1);
         result.roles[0].name.should.eql('root');
+        result.roles[0].permissions.should.have.length(1);
         done();
       });
     });

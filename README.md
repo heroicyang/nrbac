@@ -334,10 +334,13 @@ var sqlStorage = new nrbac.SqlStorage({
   }
 });
 
-nrbac.use(sqlStorage);
+// Initializes sql storage to create tables
+sqlStorage.initialize(function(err) {
+  nrbac.use(sqlStorage);
 
-// synchronizes data from/to database
-nrbac.sync(function(err) {});
+  // synchronizes data from/to database
+  nrbac.sync(function(err) {});
+});
 ```
 
 ## Run Tests
